@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>بيت زكاة العائلة</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
   <style>
     body {
       font-family: "Tahoma", sans-serif;
@@ -17,18 +19,16 @@
       color: white;
       padding: 20px;
     }
-    h1 {
-      margin: 0;
-    }
+    h1 { margin: 0; }
     .container {
       margin: 30px auto;
-      max-width: 600px;
+      max-width: 700px;
       background: white;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
     }
-    input, button {
+    input, select, button {
       padding: 10px;
       margin: 10px;
       border-radius: 5px;
@@ -41,22 +41,20 @@
       border: none;
       cursor: pointer;
     }
-    button:hover {
-      background: #219150;
-    }
-    .donations {
-      margin-top: 20px;
-      text-align: right;
-    }
-    .donations ul {
-      list-style: none;
-      padding: 0;
-    }
+    button:hover { background: #219150; }
+    .donations { margin-top: 20px; text-align: right; }
+    .donations ul { list-style: none; padding: 0; }
     .donations li {
       background: #ecf0f1;
       margin: 5px 0;
       padding: 10px;
       border-radius: 5px;
+    }
+    .summary {
+      margin-top: 20px;
+      background: #dfe6e9;
+      padding: 15px;
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -70,6 +68,12 @@
     <h2>إضافة مساهمة</h2>
     <input type="text" id="name" placeholder="اسم المتبرع">
     <input type="number" id="amount" placeholder="المبلغ (بالجنيه)">
+    <select id="purpose">
+      <option value="دعم أسرة محتاجة">دعم أسرة محتاجة</option>
+      <option value="علاج مريض">علاج مريض</option>
+      <option value="تعليم طالب">تعليم طالب</option>
+      <option value="مشاريع خيرية عامة">مشاريع خيرية عامة</option>
+    </select>
     <button onclick="addDonation()">إضافة</button>
 
     <div class="donations">
@@ -77,26 +81,89 @@
       <ul id="donationList"></ul>
       <h3>إجمالي المبلغ: <span id="total">0</span> جنيه</h3>
     </div>
+
+    <div class="summary">
+      <h3>توزيع الأموال حسب الوجهة:</h3>
+      <ul id="summaryList"></ul>
+    </div>
   </div>
 
-  <script>
+  <script type="module">
+    // 🔹 إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyADnzvRAhqDbbFjPiqF-vQvy9bqITv4xTk",
+      authDomain: "zakat-d5292.firebaseapp.com",
+      projectId: "zakat-d5292",
+      storageBucket: "zakat-d5292.firebasestorage.app",
+      messagingSenderId: "574981468354",
+      appId: "1:574981468354:web:e29d549d34c522de334b5b",
+      measurementId: "G-Z5C12EMY8D"
+    };
+
+    // تهيئة التطبيق
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     let total = 0;
-    function addDonation() {
+    let summary = {};
+
+    async function addDonation() {
       const name = document.getElementById("name").value;
       const amount = parseFloat(document.getElementById("amount").value);
+      const purpose = document.getElementById("purpose").value;
+
       if(name && amount > 0) {
+        // حفظ في Firestore
+        try {
+          await addDoc(collection(db, "donations"), {
+            name: name,
+            amount: amount,
+            purpose: purpose,
+            date: new Date().toISOString()
+          });
+          console.log("تم حفظ التبرع في قاعدة البيانات");
+        } catch (e) {
+          console.error("خطأ أثناء الحفظ: ", e);
+        }
+
+        // عرض في واجهة المستخدم
         const list = document.getElementById("donationList");
         const li = document.createElement("li");
-        li.textContent = `${name} تبرع بمبلغ ${amount} جنيه`;
+        li.textContent = `${name} تبرع بمبلغ ${amount} جنيه لصالح ${purpose}`;
         list.appendChild(li);
+
         total += amount;
         document.getElementById("total").textContent = total;
+
+        if(summary[purpose]) {
+          summary[purpose] += amount;
+        } else {
+          summary[purpose] = amount;
+        }
+        updateSummary();
+
         document.getElementById("name").value = "";
         document.getElementById("amount").value = "";
       } else {
         alert("من فضلك أدخل اسم صحيح ومبلغ أكبر من صفر");
       }
     }
+
+    function updateSummary() {
+      const summaryList = document.getElementById("summaryList");
+      summaryList.innerHTML = "";
+      for(const purpose in summary) {
+        const li = document.createElement("li");
+        li.textContent = `${purpose}: ${summary[purpose]} جنيه`;
+        summaryList.appendChild(li);
+      }
+    }
+
+    // جعل الدالة متاحة في الـ HTML
+    window.addDonation = addDonation;
   </script>
 </body>
 </html>
