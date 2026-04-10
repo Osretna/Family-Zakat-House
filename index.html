@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>بيت زكاة العائلة</title>
+  <style>
+    body {
+      font-family: "Tahoma", sans-serif;
+      background: #f9f9f9;
+      direction: rtl;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 20px;
+    }
+    h1 {
+      margin: 0;
+    }
+    .container {
+      margin: 30px auto;
+      max-width: 600px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 80%;
+    }
+    button {
+      background: #27ae60;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #219150;
+    }
+    .donations {
+      margin-top: 20px;
+      text-align: right;
+    }
+    .donations ul {
+      list-style: none;
+      padding: 0;
+    }
+    .donations li {
+      background: #ecf0f1;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>بيت زكاة العائلة</h1>
+    <p>قال الله تعالى: "وَأَقِيمُوا الصَّلَاةَ وَآتُوا الزَّكَاةَ"</p>
+  </header>
+
+  <div class="container">
+    <h2>إضافة مساهمة</h2>
+    <input type="text" id="name" placeholder="اسم المتبرع">
+    <input type="number" id="amount" placeholder="المبلغ (بالجنيه)">
+    <button onclick="addDonation()">إضافة</button>
+
+    <div class="donations">
+      <h3>قائمة المساهمات:</h3>
+      <ul id="donationList"></ul>
+      <h3>إجمالي المبلغ: <span id="total">0</span> جنيه</h3>
+    </div>
+  </div>
+
+  <script>
+    let total = 0;
+    function addDonation() {
+      const name = document.getElementById("name").value;
+      const amount = parseFloat(document.getElementById("amount").value);
+      if(name && amount > 0) {
+        const list = document.getElementById("donationList");
+        const li = document.createElement("li");
+        li.textContent = `${name} تبرع بمبلغ ${amount} جنيه`;
+        list.appendChild(li);
+        total += amount;
+        document.getElementById("total").textContent = total;
+        document.getElementById("name").value = "";
+        document.getElementById("amount").value = "";
+      } else {
+        alert("من فضلك أدخل اسم صحيح ومبلغ أكبر من صفر");
+      }
+    }
+  </script>
+</body>
+</html>
