@@ -183,6 +183,29 @@
             لَهُ"</p>
     </header>
 
+    <!-- إحصائيات عامة للجمهور -->
+    <div id="public-stats"
+        style="margin-bottom: 25px; padding: 15px; background: #fdfaf0; border: 2px solid var(--gold); border-radius: 15px;">
+        <h3 style="color: var(--dark-green); margin-top: 0;">📊 تقرير بيت المال العام</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div style="background: #e8f5e9; padding: 10px; border-radius: 10px;">
+                <small>إجمالي الوارد</small>
+                <div style="font-weight: bold; color: #2e7d32; font-size: 1.2em;"><span id="pub-total-in">0</span></div>
+            </div>
+            <div style="background: #ffebee; padding: 10px; border-radius: 10px;">
+                <small>إجمالي المصروف</small>
+                <div style="font-weight: bold; color: #c62828; font-size: 1.2em;"><span id="pub-total-out">0</span>
+                </div>
+            </div>
+            <div style="background: var(--dark-green); padding: 10px; border-radius: 10px; color: white;">
+                <small style="color: var(--gold);">الرصيد المتاح</small>
+                <div style="font-weight: bold; font-size: 1.2em;"><span id="pub-balance">0</span></div>
+            </div>
+        </div>
+        <p style="font-size: 0.8em; color: #666; margin-top: 10px;">تم تحديث البيانات بتاريخ: <span
+                id="last-update">--</span></p>
+    </div>
+
     <!-- قسم التبرع السريع (عام) -->
     <div class="container" id="public-view">
         <div class="instapay-box" onclick="copyInstaPay()">
@@ -431,6 +454,11 @@
 
             // تحديث الإحصائيات
             document.getElementById('stat-total-in').textContent = tIn;
+            // تحديث الواجهة العامة (للجميع)
+            document.getElementById('pub-total-in').textContent = tIn + " ج.م";
+            document.getElementById('pub-total-out').textContent = tOut + " ج.م";
+            document.getElementById('pub-balance').textContent = (tIn - tOut) + " ج.م";
+            document.getElementById('last-update').textContent = new Date().toLocaleDateString('ar-EG');
             document.getElementById('stat-total-out').textContent = tOut;
             document.getElementById('stat-balance').textContent = tIn - tOut;
 
@@ -501,6 +529,9 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGV2ZW50ID0+IHsgfSk7');
         }
+
+        // تشغيل جلب البيانات فور تحميل الصفحة للجمهور
+        loadData();
     </script>
 </body>
 
