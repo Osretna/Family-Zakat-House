@@ -1,225 +1,497 @@
 <!DOCTYPE html>
-<html lang="ar">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بيت زكاة العائلة - لوحة التحكم</title>
-  <style>
-    body {
-      font-family: "Tahoma", sans-serif;
-      background: #f4f7f6;
-      direction: rtl;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 20px;
-    }
-    .container {
-      margin: 30px auto;
-      max-width: 700px;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
-    }
-    input, select, button {
-      padding: 12px;
-      margin: 10px;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-      width: 90%;
-      box-sizing: border-box;
-    }
-    button {
-      background: #27ae60;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-    button:hover { background: #219150; }
-    
-    /* تنسيق قسم تسجيل الدخول */
-    #login-section {
-      margin-top: 50px;
-    }
-    
-    /* إخفاء لوحة التحكم في البداية */
-    #admin-panel {
-      display: none;
-    }
+<html lang="ar" dir="rtl">
 
-    .donations { margin-top: 20px; text-align: right; }
-    .donations ul { list-style: none; padding: 0; }
-    .donations li {
-      background: #f9f9f9;
-      margin: 8px 0;
-      padding: 12px;
-      border-right: 5px solid #27ae60;
-      border-radius: 5px;
-      font-size: 0.9em;
-    }
-    .summary {
-      margin-top: 20px;
-      background: #eef2f3;
-      padding: 15px;
-      border-radius: 8px;
-    }
-    .logout-btn {
-        background: #e74c3c;
-        width: auto;
-        padding: 5px 15px;
-        float: left;
-    }
-  </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بيت زكاة العائلة</title>
+
+    <!-- إعدادات التطبيق (PWA) ليصبح قابل للتثبيت -->
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest"
+        href="data:application/json;base64,ewogICJuYW1lIjogImJlaXQgWiFrYXQiLAogICJzaG9ydF9uYW1lIjogIlpha2F0IiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YWFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMmMzZTUwIiwKICAidGhlbWVfY29sb3IiOiAiIzJjM2U1MCIKfQ==">
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark-green: #1b4d3e;
+            --sand: #f4ece1;
+        }
+
+        body {
+            font-family: "Tahoma", "Arial", sans-serif;
+            margin: 0;
+            padding: 0;
+            /* خلفية تعبيرية لبيت قديم (طراز إسلامي) */
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('https://images.unsplash.com/photo-1564182842519-8a3b2af3e228?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
+        }
+
+        header {
+            background: rgba(27, 77, 62, 0.9);
+            color: var(--gold);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--gold);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        /* قسم انستا باي */
+        .instapay-box {
+            background: #e1f5fe;
+            border: 2px dashed #0288d1;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .instapay-box:hover {
+            background: #b3e5fc;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            background: var(--dark-green);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item span {
+            display: block;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            /* لمنع الزووم في الآيفون */
+        }
+
+        button {
+            background: var(--dark-green);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-instapay {
+            background: #7a288a;
+            /* لون قريب لهوية انستا باي */
+            color: white;
+            border: none;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        #login-section {
+            max-width: 400px;
+            margin-top: 50px;
+        }
+
+        #admin-panel {
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        th {
+            background: #f2f2f2;
+        }
+
+        .scroll-box {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+        }
+    </style>
 </head>
+
 <body>
 
-  <header>
-    <h1>بيت زكاة العائلة</h1>
-    <p>لوحة إدارة المساهمات</p>
-  </header>
+    <header>
+        <h1>بيت زكاة العائلة</h1>
+        <p style="color:white; font-style: italic;">"مَّن ذَا الَّذِي يُقْرِضُ اللَّهَ قَرْضًا حَسَنًا فَيُضَاعِفَهُ
+            لَهُ"</p>
+    </header>
 
-  <!-- قسم تسجيل الدخول -->
-  <div id="login-section" class="container">
-    <h2>تسجيل دخول الإدارة</h2>
-    <input type="text" id="username" placeholder="اسم المستخدم">
-    <input type="password" id="password" placeholder="كلمة المرور">
-    <button onclick="login()">دخول</button>
-    <p id="login-error" style="color: red; display: none;">خطأ في البيانات، حاول مجدداً</p>
-  </div>
-
-  <!-- لوحة التحكم (تظهر بعد تسجيل الدخول) -->
-  <div id="admin-panel" class="container">
-    <button class="logout-btn" onclick="logout()">خروج</button>
-    <div style="clear: both;"></div>
-    
-    <h2>إضافة مساهمة جديدة</h2>
-    <input type="text" id="name" placeholder="اسم المتبرع">
-    <input type="number" id="amount" placeholder="المبلغ (بالجنيه)">
-    <select id="purpose">
-      <option value="دعم أسرة محتاجة">دعم أسرة محتاجة</option>
-      <option value="علاج مريض">علاج مريض</option>
-      <option value="تعليم طالب">تعليم طالب</option>
-      <option value="مشاريع خيرية عامة">مشاريع خيرية عامة</option>
-    </select>
-    <button onclick="addDonation()">حفظ وإضافة</button>
-
-    <hr>
-
-    <div class="donations">
-      <h3>السجل التاريخي للمساهمات:</h3>
-      <ul id="donationList"></ul>
-      <h3>إجمالي المبلغ الكلي: <span id="total">0</span> جنيه</h3>
+    <!-- قسم التبرع السريع (عام) -->
+    <div class="container" id="public-view">
+        <div class="instapay-box" onclick="copyInstaPay()">
+            <h3 style="margin:0; color:#0288d1;">التبرع عبر InstaPay 💳</h3>
+            <p>اضغط لنسخ الرقم وفتح التطبيق: <strong>01120194940</strong></p>
+            <button class="btn-instapay">فتح انستا باي الآن</button>
+        </div>
+        <button onclick="showLogin()"
+            style="background: none; color: #666; border: none; text-decoration: underline;">لوحة تحكم الإدارة</button>
     </div>
 
-    <div class="summary">
-      <h3>توزيع الأموال حسب الوجهة:</h3>
-      <ul id="summaryList"></ul>
+    <!-- تسجيل الدخول -->
+    <div id="login-section" class="container" style="display:none;">
+        <h2>دخول المسؤول</h2>
+        <input type="text" id="username" placeholder="اسم المستخدم">
+        <input type="password" id="password" placeholder="كلمة المرور">
+        <button onclick="login()">دخول</button>
+        <button onclick="showPublic()" style="background:#95a5a6;">عودة</button>
     </div>
-  </div>
 
-  <script type="module">
-    // 🔹 إعدادات Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    <!-- لوحة الإدارة -->
+    <div id="admin-panel" class="container">
+        <button onclick="showPublicFromAdmin()"
+            style="background:#d4af37; color:#1b4d3e; width:auto; padding: 8px 20px; margin-bottom:10px; font-weight:bold;">🏠
+            العودة للرئيسية</button>
+        <div class="stats-bar">
+            <div class="stat-item">إجمالي الوارد<span id="stat-total-in">0</span></div>
+            <div class="stat-item">إجمالي المصرف<span id="stat-total-out">0</span></div>
+            <div class="stat-item">الرصيد الحالي<span id="stat-balance">0</span></div>
+        </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyADnzvRAhqDbbFjPiqF-vQvy9bqITv4xTk",
-      authDomain: "zakat-d5292.firebaseapp.com",
-      projectId: "zakat-d5292",
-      storageBucket: "zakat-d5292.firebasestorage.app",
-      messagingSenderId: "574981468354",
-      appId: "1:574981468354:web:e29d549d34c522de334b5b"
-    };
+        <div class="grid">
+            <div style="border: 1px solid #ddd; padding: 10px; border-radius: 10px;">
+                <h4 style="color:var(--dark-green)">إضافة تبرع</h4>
+                <select id="donor-select">
+                    <option value="">-- اختر متبرع --</option>
+                    <option value="new">+ إضافة اسم جديد</option>
+                </select>
+                <input type="text" id="new-donor-name" placeholder="اسم المتبرع الجديد" style="display:none;">
+                <input type="number" id="amount-in" placeholder="المبلغ">
+                <button onclick="saveDonation()">حفظ</button>
+            </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+            <div style="border: 1px solid #ddd; padding: 10px; border-radius: 10px;">
+                <h4 style="color:red">تسجيل صرف</h4>
+                <input type="number" id="amount-out" placeholder="المبلغ">
+                <input type="text" id="purpose-out" placeholder="الجهة (مثلاً: كفالة يتيم)">
+                <button onclick="saveExpense()" style="background:red; color:white;">خصم وصرف</button>
+            </div>
+        </div>
 
-    // دالة تسجيل الدخول
-    window.login = function() {
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
 
-      if (user === "admin" && pass === "123456") {
-        document.getElementById("login-section").style.display = "none";
-        document.getElementById("admin-panel").style.display = "block";
-        loadData(); // تحميل البيانات عند الدخول الناجح
-      } else {
-        document.getElementById("login-error").style.display = "block";
-      }
-    }
+        <div class="grid" style="margin-top:20px;">
+            <!-- سجل تبرعات تفصيلي (للتعديل والحذف) -->
+            <div>
+                <h4>سجل التبرعات (تفصيلي)</h4>
+                <div class="scroll-box">
+                    <table id="detailed-donations-table">
+                        <tr>
+                            <th>الاسم</th>
+                            <th>المبلغ</th>
+                            <th>تحكم</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
 
-    // دالة الخروج
-    window.logout = function() {
-        location.reload(); // إعادة تحميل الصفحة للخروج
-    }
+            <!-- سجل المصاريف -->
+            <div>
+                <h4>سجل المصاريف</h4>
+                <div class="scroll-box">
+                    <table id="expenses-table"></table>
+                </div>
+            </div>
+        </div>
 
-    // دالة إضافة تبرع
-    window.addDonation = async function() {
-      const name = document.getElementById("name").value;
-      const amount = parseFloat(document.getElementById("amount").value);
-      const purpose = document.getElementById("purpose").value;
+        <!-- جدول الملخص (اختياري للعرض فقط) -->
+        <div class="card" style="margin-top:20px;">
+            <h4>ملخص إجمالي كل متبرع</h4>
+            <div class="scroll-box">
+                <table id="donors-table"></table>
+            </div>
+        </div>
+    </div>
 
-      if(name && amount > 0) {
-        try {
-          await addDoc(collection(db, "donations"), {
-            name: name,
-            amount: amount,
-            purpose: purpose,
-            date: new Date()
-          });
-          alert("تم الحفظ بنجاح");
-          loadData(); // إعادة تحميل القائمة بعد الإضافة
-          
-          document.getElementById("name").value = "";
-          document.getElementById("amount").value = "";
-        } catch (e) {
-          console.error("خطأ أثناء الحفظ: ", e);
-          alert("حدث خطأ أثناء الاتصال بقاعدة البيانات");
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyADnzvRAhqDbbFjPiqF-vQvy9bqITv4xTk",
+            authDomain: "zakat-d5292.firebaseapp.com",
+            projectId: "zakat-d5292",
+            storageBucket: "zakat-d5292.firebasestorage.app",
+            messagingSenderId: "574981468354",
+            appId: "1:574981468354:web:e29d549d34c522de334b5b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // الكود المسئول عن منع الخروج عند عمل ريفريش
+        window.onload = function () {
+            const isLoggedIn = localStorage.getItem("zakatLoggedIn");
+            if (isLoggedIn === "true") {
+                document.getElementById('public-view').style.display = 'none';
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                loadData(); // تحميل البيانات تلقائياً
+            }
+        };
+
+        // تعديل دالة الدخول لحفظ الحالة
+        // ابحث عن دالة login واستبدلها بهذا الجزء أو أضف سطر localStorage
+        window.login = function () {
+            if (document.getElementById("username").value === "admin" && document.getElementById("password").value === "123456") {
+                localStorage.setItem("zakatLoggedIn", "true"); // حفظ حالة الدخول
+                document.getElementById("login-section").style.display = "none";
+                document.getElementById("admin-panel").style.display = "block";
+                loadData();
+            } else { alert("خطأ في البيانات"); }
         }
-      } else {
-        alert("يرجى ملء البيانات بشكل صحيح");
-      }
-    }
 
-    // دالة جلب البيانات من Firebase وعرضها
-    async function loadData() {
-      const donationList = document.getElementById("donationList");
-      const summaryList = document.getElementById("summaryList");
-      donationList.innerHTML = "جاري التحميل...";
-      
-      let total = 0;
-      let summary = {};
+        // أضف هذه الدالة لتسجيل الخروج بالكامل
+        window.logout = function () {
+            localStorage.removeItem("zakatLoggedIn");
+            location.reload();
+        }
 
-      const q = query(collection(db, "donations"), orderBy("date", "desc"));
-      const querySnapshot = await getDocs(q);
-      
-      donationList.innerHTML = "";
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const li = document.createElement("li");
-        li.textContent = `${data.name} - ${data.amount} ج.م (${data.purpose})`;
-        donationList.appendChild(li);
+        // دالة حذف عملية
+        window.deleteItem = async function (id) {
+            if (confirm("هل أنت متأكد من حذف هذه العملية؟ سيتم تحديث الحسابات فوراً.")) {
+                await deleteDoc(doc(db, "transactions", id));
+                loadData(); // تحديث الجداول دون ريفريش الصفحة
+            }
+        }
 
-        total += data.amount;
-        summary[data.purpose] = (summary[data.purpose] || 0) + data.amount;
-      });
+        // دالة تعديل مبلغ عملية
+        window.editItem = async function (id, oldAmount) {
+            const newAmount = prompt("أدخل المبلغ الجديد:", oldAmount);
+            if (newAmount !== null && !isNaN(newAmount) && newAmount !== "") {
+                await updateDoc(doc(db, "transactions", id), {
+                    amount: parseFloat(newAmount)
+                });
+                loadData(); // تحديث الجداول دون ريفريش الصفحة
+            }
+        }
 
-      document.getElementById("total").textContent = total;
+        // وظائف الواجهة
+        window.showLogin = () => { document.getElementById('public-view').style.display = 'none'; document.getElementById('login-section').style.display = 'block'; }
+        window.showPublic = () => { document.getElementById('login-section').style.display = 'none'; document.getElementById('public-view').style.display = 'block'; }
 
-      summaryList.innerHTML = "";
-      for (const p in summary) {
-        const li = document.createElement("li");
-        li.textContent = `${p}: ${summary[p]} جنيه`;
-        summaryList.appendChild(li);
-      }
-    }
-  </script>
+        window.showPublicFromAdmin = () => {
+            document.getElementById('admin-panel').style.display = 'none';
+            document.getElementById('public-view').style.display = 'block';
+        }
+        // تبرع انستا باي
+        window.copyInstaPay = () => {
+            navigator.clipboard.writeText("01120194940");
+            alert("تم نسخ الرقم: 01120194940. سيتم فتح انستا باي الآن، قم بلصق الرقم هناك.");
+            window.location.href = "instapay://"; // محاولة فتح التطبيق
+            setTimeout(() => {
+                if (!document.hidden) window.open("https://www.instapay.eg/", "_blank"); // إذا لم يفتح، افتح الموقع
+            }, 2000);
+        }
+
+        document.getElementById('donor-select').addEventListener('change', function () {
+            document.getElementById('new-donor-name').style.display = (this.value === 'new') ? 'block' : 'none';
+        });
+
+        window.login = function () {
+            if (document.getElementById("username").value === "admin" && document.getElementById("password").value === "123456") {
+                document.getElementById("login-section").style.display = "none";
+                document.getElementById("admin-panel").style.display = "block";
+                loadData();
+            } else { alert("خطأ"); }
+        }
+
+        window.saveDonation = async function () {
+            const sel = document.getElementById('donor-select');
+            const name = sel.value === 'new' ? document.getElementById('new-donor-name').value : sel.value;
+            const amt = parseFloat(document.getElementById('amount-in').value);
+            if (!name || !amt) return;
+            await addDoc(collection(db, "transactions"), { type: "in", name, amount: amt, date: new Date() });
+            alert("تم تسجيل التبرع");
+            // استبدل location.reload() بـ :
+            loadData();
+            document.getElementById('amount-in').value = ""; // تفريغ الخانة بعد الحفظ
+        }
+
+        window.saveExpense = async function () {
+            const amt = parseFloat(document.getElementById('amount-out').value);
+            const pur = document.getElementById('purpose-out').value;
+            if (!amt || !pur) return;
+            await addDoc(collection(db, "transactions"), { type: "out", purpose: pur, amount: amt, date: new Date() });
+            alert("تم تسجيل التبرع");
+            // استبدل location.reload() بـ :
+            loadData();
+            document.getElementById('amount-in').value = ""; // تفريغ الخانة بعد الحفظ
+        }
+
+        async function loadData() {
+            const snap = await getDocs(query(collection(db, "transactions"), orderBy("date", "desc")));
+            let tIn = 0, tOut = 0, donorsSum = {};
+
+            const dDetailedTable = document.getElementById('detailed-donations-table');
+            const eTable = document.getElementById('expenses-table');
+            const dSummaryTable = document.getElementById('donors-table');
+            const dSelect = document.getElementById('donor-select');
+
+            // تفريغ الجداول
+            dDetailedTable.innerHTML = "<tr><th>الاسم</th><th>المبلغ</th><th>تحكم</th></tr>";
+            eTable.innerHTML = "<tr><th>الجهة</th><th>المبلغ</th><th>تحكم</th></tr>";
+            dSummaryTable.innerHTML = "<tr><th>الاسم</th><th>إجمالي التبرع</th></tr>";
+            dSelect.innerHTML = '<option value="">-- اختر متبرع --</option><option value="new">+ إضافة اسم جديد</option>';
+
+            snap.forEach((documentSnapshot) => {
+                const data = documentSnapshot.data();
+                const id = documentSnapshot.id;
+
+                if (data.type === 'in') {
+                    tIn += data.amount;
+                    donorsSum[data.name] = (donorsSum[data.name] || 0) + data.amount;
+
+                    // إضافة التبرع للسجل التفصيلي مع أزرار التعديل والحذف
+                    dDetailedTable.innerHTML += `<tr>
+                <td>${data.name}</td>
+                <td>${data.amount}</td>
+                <td>
+                    <button onclick="editItem('${id}', ${data.amount})" style="width:auto; padding:2px 5px; background:blue;">📝</button>
+                    <button onclick="deleteItem('${id}')" style="width:auto; padding:2px 5px; background:red;">🗑️</button>
+                </td>
+            </tr>`;
+                } else {
+                    tOut += data.amount;
+                    eTable.innerHTML += `<tr>
+                <td>${data.purpose}</td>
+                <td>${data.amount}</td>
+                <td>
+                    <button onclick="editItem('${id}', ${data.amount})" style="width:auto; padding:2px 5px; background:blue;">📝</button>
+                    <button onclick="deleteItem('${id}')" style="width:auto; padding:2px 5px; background:red;">🗑️</button>
+                </td>
+            </tr>`;
+                }
+            });
+
+            // تحديث الإحصائيات
+            document.getElementById('stat-total-in').textContent = tIn;
+            document.getElementById('stat-total-out').textContent = tOut;
+            document.getElementById('stat-balance').textContent = tIn - tOut;
+
+            // ملء جدول الملخص والقائمة المنسدلة
+            for (let n in donorsSum) {
+                dSummaryTable.innerHTML += `<tr><td>${n}</td><td>${donorsSum[n]} ج.م</td></tr>`;
+                let opt = document.createElement('option'); opt.value = n; opt.textContent = n;
+                dSelect.appendChild(opt);
+            }
+        }
+
+        window.editItem = async function (id, oldAmount) {
+            const newAmount = prompt("أدخل المبلغ الجديد المصحح:", oldAmount);
+            if (newAmount !== null && !isNaN(newAmount) && newAmount !== "") {
+                try {
+                    await updateDoc(doc(db, "transactions", id), {
+                        amount: parseFloat(newAmount)
+                    });
+                    alert("تم تعديل المبلغ بنجاح");
+                    loadData(); // لتحديث الجداول والملخص تلقائياً
+                } catch (e) {
+                    alert("خطأ أثناء التعديل");
+                }
+            }
+        }
+
+        // 1. دالة لحذف كافة تبرعات شخص معين (تصفير حسابه)
+        window.deleteAllDonorData = async function (donorName) {
+            if (confirm(`هل أنت متأكد من حذف كافة تبرعات (${donorName})؟ سيتم مسح تاريخه بالكامل وتحديث الرصيد.`)) {
+                const q = query(collection(db, "transactions"), orderBy("date", "desc"));
+                const snap = await getDocs(q);
+
+                // البحث عن كل الوثائق التي تخص هذا الاسم وحذفها
+                snap.forEach(async (documentSnapshot) => {
+                    const data = documentSnapshot.data();
+                    if (data.type === 'in' && data.name === donorName) {
+                        await deleteDoc(doc(db, "transactions", documentSnapshot.id));
+                    }
+                });
+
+                setTimeout(() => { loadData(); }, 1000); // تحديث بعد ثانية للتأكد من انتهاء الحذف
+                alert(`تم حذف سجلات ${donorName} بنجاح`);
+            }
+        }
+
+        // 2. دالة لتعديل اسم المتبرع في كل سجلاته القديمة
+        window.renameDonor = async function (oldName) {
+            const newName = prompt("أدخل الاسم الجديد المصحح:", oldName);
+            if (newName && newName !== oldName) {
+                const q = query(collection(db, "transactions"), orderBy("date", "desc"));
+                const snap = await getDocs(q);
+
+                snap.forEach(async (documentSnapshot) => {
+                    const data = documentSnapshot.data();
+                    if (data.name === oldName) {
+                        await updateDoc(doc(db, "transactions", documentSnapshot.id), {
+                            name: newName
+                        });
+                    }
+                });
+
+                setTimeout(() => { loadData(); }, 1000);
+                alert("تم تعديل الاسم في كافة السجلات");
+            }
+        }
+
+        // تسجيل الـ Service Worker لجعل التطبيق قابل للتثبيت
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGV2ZW50ID0+IHsgfSk7');
+        }
+    </script>
 </body>
+
 </html>
