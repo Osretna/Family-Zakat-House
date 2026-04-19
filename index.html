@@ -60,11 +60,17 @@
         .container {
             max-width: 800px;
             margin: 20px auto;
-            background: rgba(255, 255, 255, 0.92);
+            /* جعل الخلفية شفافة جداً مع الحفاظ على لمسة بيضاء خفيفة */
+            background: rgba(255, 255, 255, 0.15);
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+            /* زيادة الـ Blur لجعل النص يبرز فوق الصورة */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            /* تغيير لون الخط الرئيسي للأبيض ليظهر فوق الصورة الغامقة */
+            color: #ffffff;
         }
 
         /* قسم انستا باي */
@@ -152,25 +158,94 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            background: white;
+            /* جعل الجدول شفافاً */
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
         }
 
         th,
         td {
-            border: 1px solid #ddd;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 10px;
             text-align: center;
             font-size: 0.9em;
+            color: white;
+            /* لون الخط داخل الجدول */
         }
 
         th {
-            background: #f2f2f2;
+            /* لون خلفية رأس الجدول (أخضر داكن شفاف) */
+            background: rgba(27, 77, 62, 0.8);
+            color: var(--gold);
+        }
+
+        h2,
+        h3,
+        h4 {
+            color: var(--gold);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+            /* ظل خلف الخط لزيادة الوضوح */
         }
 
         .scroll-box {
             max-height: 250px;
             overflow-y: auto;
-            border: 1px solid #eee;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .designer-credit {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 2px;
+            background: rgba(0, 0, 0, 0.4);
+            /* خلفية داكنة لبروز الألوان */
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .designer-name {
+            font-weight: bold;
+            display: inline-block;
+            /* تم تغيير الوقت إلى 6 ثوانٍ ليكون بطيئاً واحترافياً */
+            animation: slowLightFlicker 6s infinite ease-in-out;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        /* الألوان: ذهبي، أزرق، أحمر، أسود بطريقة ناعمة وبطيئة */
+        @keyframes slowLightFlicker {
+
+            0%,
+            100% {
+                color: #d4af37;
+                text-shadow: 0 0 15px #d4af37;
+                opacity: 1;
+            }
+
+            25% {
+                color: #3498db;
+                /* أزرق سماوي احترافي */
+                text-shadow: 0 0 15px #3498db;
+                opacity: 0.9;
+            }
+
+            50% {
+                color: #e74c3c;
+                /* أحمر هادئ */
+                text-shadow: 0 0 15px #e74c3c;
+                opacity: 1;
+            }
+
+            75% {
+                color: #000000;
+                /* الأسود */
+                text-shadow: 0 0 10px #ffffff;
+                /* توهج أبيض خفيف ليظهر الأسود */
+                opacity: 0.8;
+            }
         }
     </style>
 </head>
@@ -210,7 +285,7 @@
     <div class="container" id="public-view">
         <div class="instapay-box" onclick="copyInstaPay()">
             <h3 style="margin:0; color:#0288d1;">التبرع عبر InstaPay 💳</h3>
-            <p>اضغط لنسخ الرقم وفتح التطبيق: <strong>01120194940</strong></p>
+            <p>اضغط للتحويل المباشر أو نسخ الرقم: <strong>01120194940</strong></p>
             <button class="btn-instapay">فتح انستا باي الآن</button>
         </div>
         <button onclick="showLogin()"
@@ -291,6 +366,10 @@
         </div>
     </div>
 
+    <footer class="designer-credit">
+        Designed by: <span class="designer-name">Eng. Mohamed Salah</span>
+    </footer>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
@@ -364,14 +443,32 @@
         }
         // تبرع انستا باي
         window.copyInstaPay = () => {
-            navigator.clipboard.writeText("01120194940");
-            alert("تم نسخ الرقم: 01120194940. سيتم فتح انستا باي الآن، قم بلصق الرقم هناك.");
-            window.location.href = "instapay://"; // محاولة فتح التطبيق
-            setTimeout(() => {
-                if (!document.hidden) window.open("https://www.instapay.eg/", "_blank"); // إذا لم يفتح، افتح الموقع
-            }, 2000);
-        }
+            const phoneNumber = "01120194940";
 
+            // 1. نسخ الرقم أولاً لتسهيل العملية على المستخدم
+            navigator.clipboard.writeText(phoneNumber).then(() => {
+                alert("تم نسخ الرقم: " + phoneNumber + "\nسيتم الآن محاولة فتح تطبيق InstaPay...");
+
+                // 2. محاولة فتح التطبيق مباشرة
+                // الرابط التقني المرجح لانستا باي هو instapay:// 
+                window.location.href = "instapay://";
+
+                // 3. اختبار: إذا مر وقت ولم يغادر المستخدم الصفحة، نفتح الموقع
+                let checkApp = setTimeout(() => {
+                    // إذا كان المستخدم لا يزال يرى الصفحة (لم يفتح التطبيق)
+                    if (!document.hidden) {
+                        if (confirm("يبدو أن تطبيق انستا باي غير مثبت على جهازك. هل تريد الانتقال إلى الموقع الرسمي؟")) {
+                            window.open("https://www.instapay.eg/", "_blank");
+                        }
+                    }
+                }, 2500); // ننتظر 2.5 ثانية قبل التحويل للموقع
+
+                // إذا نجح فتح التطبيق، المتصفح سيتوقف عن العمل في هذه الصفحة ولن يعمل الـ Timer
+                window.onblur = () => {
+                    clearTimeout(checkApp); // إلغاء التحويل للموقع لو فتح التطبيق فعلاً
+                };
+            });
+        }
         document.getElementById('donor-select').addEventListener('change', function () {
             document.getElementById('new-donor-name').style.display = (this.value === 'new') ? 'block' : 'none';
         });
