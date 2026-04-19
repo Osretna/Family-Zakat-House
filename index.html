@@ -6,12 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بيت زكاة العائلة</title>
 
-    <!-- إعدادات التطبيق (PWA) ليصبح قابل للتثبيت -->
-    <meta name="theme-color" content="#2c3e50">
+    <!-- إعدادات التطبيق للموبايل -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="manifest"
-        href="data:application/json;base64,ewogICJuYW1lIjogImJlaXQgWiFrYXQiLAogICJzaG9ydF9uYW1lIjogIlpha2F0IiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YWFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMmMzZTUwIiwKICAidGhlbWVfY29sb3IiOiAiIzJjM2U1MCIKfQ==">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="بيت الزكاة">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1862/1862358.png">
 
+    <!-- ملف Manifest لتعريف التطبيق -->
+    <link rel="manifest" href="manifest.json">
+    <script>
+        // تسجيل الخدمة (Service Worker) ليصبح التطبيق قابل للتثبيت
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(() => {
+                console.log('تم تسجيل خدمة التطبيق بنجاح');
+            });
+        }
+    </script>
     <style>
         :root {
             --gold: #d4af37;

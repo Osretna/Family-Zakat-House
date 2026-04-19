@@ -1,0 +1,15 @@
+{
+  "name": "بيت زكاة العائلة",
+  "short_name": "بيت الزكاة",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1b4d3e",
+  "theme_color": "#1b4d3e",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1862/1862358.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
